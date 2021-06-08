@@ -5,42 +5,49 @@ using Unity.Mathematics;
 
 namespace KaizerwaldCode.ProceduralGeneration.Data
 {
-    [Serializable]
     public struct MapGenerationData : IComponentData { }
-    // PerlinNoise Data
-    /**
-     * int Seed
-     * int Octaves
-     * float Lacunarity
-     * float Persistance
-     * float Scale
-     * float2 Offset
-    */
+
     namespace PerlinNoise
     {
+        public struct MapSize : IComponentData
+        {
+            public int Value;
+        }
         public struct Seed: IComponentData
         {
-            public int value;
+            public int Value;
         }
         public struct Octaves : IComponentData
         {
-            public int value;
+            public int Value;
         }
         public struct Scale : IComponentData
         {
-            public float value;
+            public float Value;
         }
         public struct Lacunarity : IComponentData
         {
-            public float value;
+            public float Value;
         }
         public struct Persistance : IComponentData
         {
-            public float value;
+            public float Value;
         }
         public struct Offset : IComponentData
         {
-            public float2 value;
+            public float2 Value;
+        }
+        public struct LevelOfDetail : IComponentData
+        {
+            public int Value;
+        }
+    }
+
+    namespace DynamicBuffer.HeightMap
+    {
+        public struct NoiseMap : IBufferElementData
+        {
+            public float Value;
         }
     }
 }
