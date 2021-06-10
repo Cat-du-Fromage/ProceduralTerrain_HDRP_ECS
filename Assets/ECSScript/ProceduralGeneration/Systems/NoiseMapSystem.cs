@@ -15,6 +15,8 @@ namespace KaizerwaldCode.ProceduralGeneration.System
     {
         NativeArray<float> _noiseMapNativeArray;
         NativeArray<float2> _octaveOffsetNativeArray;
+        NativeArray<float> _minMaxHeightNativeArray;
+
         EntityManager _em;
         protected override void OnCreate()
         {
@@ -26,22 +28,30 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         {
             Entity _mapSettings = GetSingletonEntity<Data.Tag.MapSettings>();
             int _mapSurface = math.mul(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
-            Debug.Log(_mapSurface);
+
+            /*========================
+             *Native Array declaration
+             ========================*/
             _noiseMapNativeArray = new NativeArray<float>(_mapSurface, Allocator.TempJob);
             _octaveOffsetNativeArray = new NativeArray<float2>(GetComponent<MapSett.Octaves>(_mapSettings).Value, Allocator.TempJob);
-            /*
-             * Perlin Noise Job
-             * return : HeightMap
-             */
+            _minMaxHeightNativeArray = new NativeArray<float>(2, Allocator.TempJob); // 0:min; 1:max;
+
+            /*========================
+             * Random octaves Offset Job
+             * return : OctOffsetArrayJob
+             ========================*/
             MapJobs.NoiseRandomJob _noiseRandomJob = new MapJobs.NoiseRandomJob()
             {
                 RandomJob = new Unity.Mathematics.Random((uint)GetComponent<MapSett.Seed>(_mapSettings).Value),
                 OffsetJob = GetComponent<MapSett.Offset>(_mapSettings).Value,
                 OctOffsetArrayJob = _octaveOffsetNativeArray,
             };
-            JobHandle _noiseRandomJobHandle = _noiseRandomJob.Schedule(_octaveOffsetNativeArray.Length, 2, this.Dependency);
-            _noiseRandomJobHandle.Complete();
+            JobHandle _noiseRandomJobHandle = _noiseRandomJob.Schedule(_octaveOffsetNativeArray.Length, 32);
 
+            /*========================
+             * Perlin Noise Job
+             * return : NoiseMap
+             ========================*/
             MapJobs.NoiseHeightMapJob _noiseHeightMapJob = new MapJobs.NoiseHeightMapJob()
             {
                 MapSizeJob = GetComponent<MapSett.MapSize>(_mapSettings).Value,
@@ -51,64 +61,50 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 LacunarityJob = GetComponent<MapSett.Lacunarity>(_mapSettings).Value,
                 NoiseMap = _noiseMapNativeArray,
                 OctOffsetArray = _octaveOffsetNativeArray,
+                MinMaxHeightJob = _minMaxHeightNativeArray,
             };
-            JobHandle _noiseHeightMapJobHandle = _noiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 64, _noiseRandomJobHandle);
-            _noiseHeightMapJobHandle.Complete();
-            /*
+            JobHandle _noiseHeightMapJobHandle = _noiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 250, _noiseRandomJobHandle);
+
+            /*========================
+             * Inverse Lerp Perlin Noise Job
+             * return : inverse lerp NoiseMap
+             ========================*/
             MapJobs.UnLerpNoiseHeightMapJob _unLerpNoiseHeightMapJob = new MapJobs.UnLerpNoiseHeightMapJob()
             {
                 MapSizeJob = GetComponent<MapSett.MapSize>(_mapSettings).Value,
                 NoiseMap = _noiseMapNativeArray,
-                MaxNoiseHeightJob = float.MaxValue,
-                MinNoiseHeightJob = float.MinValue,
+                MinMaxHeightJob = _minMaxHeightNativeArray,
             };
-            JobHandle _unLerpNoiseHeightMapJobHandle = _unLerpNoiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 64, _noiseHeightMapJobHandle);
-            _unLerpNoiseHeightMapJobHandle.Complete();
-            */
-            /*
-            MapJobs.PerlinNoiseJob NoiseMapHandle = new MapJobs.PerlinNoiseJob()
-            {
-                mapSizeJob = GetComponent<MapSett.MapSize>(MapSettings).Value,
-                seedJob = GetComponent<MapSett.Seed>(MapSettings).Value,
-                scaleJob = GetComponent<MapSett.Scale>(MapSettings).Value,
-                octavesJob = GetComponent<MapSett.Octaves>(MapSettings).Value,
-                persistanceJob = GetComponent<MapSett.Persistance>(MapSettings).Value,
-                lacunarityJob = GetComponent<MapSett.Lacunarity>(MapSettings).Value,
-                offsetJob = GetComponent<MapSett.Offset>(MapSettings).Value,
-                noiseMap = _noiseMapNativeArray,
-                octOffsetArray = _octaveOffsetNativeArray,
-            };
-            JobHandle jobHandle = NoiseMapHandle.Schedule(this.Dependency);
-            jobHandle.Complete();
-            */
+            JobHandle _unLerpNoiseHeightMapJobHandle = _unLerpNoiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 250, _noiseHeightMapJobHandle);
+            _unLerpNoiseHeightMapJobHandle.Complete(); // doc is lying : .Run() do not force previous job to complete
 
-            /*
-             * Add each element of the NativeArray HeightMap to a solid DynamicBuffer
-             */
+            /*========================
+             * Pass Noise Map to DynamicBuffer
+             * Process : NoiseMap stored
+             * END Event : MapSettingsConverted
+             * START Event : NoiseMapCalculated
+             ========================*/
             Entities
                 .WithName("NoiseMapToBuffer")
                 .WithoutBurst()
                 .WithStructuralChanges()
                 .ForEach((Entity Map, ref DynamicBuffer<BufferHeightMap.NoiseMap> noiseMap) =>
                 {
-                    for (int i = 0; i < _noiseMapNativeArray.Length; i++)
-                    {
-                        BufferHeightMap.NoiseMap height = new BufferHeightMap.NoiseMap();
-                        height.Value = _noiseMapNativeArray[i];
-                        noiseMap.Add(height);
-                    }
+                    noiseMap.Reinterpret<float>().CopyFrom(_noiseMapNativeArray);
+                    noiseMap.Reinterpret<BufferHeightMap.NoiseMap>();
                     _em.RemoveComponent<Data.Event.MapSettingsConverted>(GetSingletonEntity<Data.Event.MapSettingsConverted>());
                     _em.AddComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
                 }).Run();
-
+            
             _octaveOffsetNativeArray.Dispose();
             _noiseMapNativeArray.Dispose();
+            _minMaxHeightNativeArray.Dispose();
         }
-
         protected override void OnDestroy()
         {
             if (_noiseMapNativeArray.IsCreated) _noiseMapNativeArray.Dispose();
             if (_octaveOffsetNativeArray.IsCreated) _octaveOffsetNativeArray.Dispose();
+            if (_minMaxHeightNativeArray.IsCreated) _minMaxHeightNativeArray.Dispose();
         }
     }
 }
