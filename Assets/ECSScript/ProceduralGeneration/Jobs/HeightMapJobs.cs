@@ -109,56 +109,95 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
                 }
             }
     */
+    /// <summary>
+    /// Process RandomJob
+    /// </summary>
     [BurstCompile(CompileSynchronously = true)]
-    public struct NewPerlinJob : IJobParallelFor
+    public struct NoiseRandomJob : IJobParallelFor
+    {
+        [ReadOnly] public Unity.Mathematics.Random RandomJob;
+        [ReadOnly] public float2 OffsetJob;
+        [WriteOnly] public NativeArray<float2> OctOffsetArrayJob;
+
+        public void Execute(int index)
+        {
+            float _offsetX = RandomJob.NextInt(-100000, 100000) + OffsetJob.x;
+            float _offsetY = RandomJob.NextInt(-100000, 100000) + OffsetJob.y;
+            OctOffsetArrayJob[index] = new float2(_offsetX, _offsetY);
+        }
+    }
+
+    [BurstCompile(CompileSynchronously = true)]
+    public struct NoiseHeightMapJob : IJobParallelFor
     {
         [ReadOnly] public int MapSizeJob;
         [ReadOnly] public int OctavesJob;
         [ReadOnly] public float LacunarityJob;
         [ReadOnly] public float PersistanceJob;
         [ReadOnly] public float ScaleJob;
+        float _maxNoiseHeight;
+        float _minNoiseHeight;
 
-        [ReadOnly]NativeArray<float2> octOffsetArray;
-        public NativeArray<float> noiseMap;
+        [ReadOnly] public NativeArray<float2> OctOffsetArray;
+        [WriteOnly] public NativeArray<float> NoiseMap;
         public void Execute(int index)
         {
             //FOR LOOP
-            float maxNoiseHeight = float.MinValue;
-            float minNoiseHeight = float.MaxValue;
+            _maxNoiseHeight = float.MinValue;
+            _minNoiseHeight = float.MaxValue;
 
-            float halfMapSize = MapSizeJob / 2f;
+            float _halfMapSize = MapSizeJob / 2f;
 
             int y = (int)math.floor(index / MapSizeJob);
             int x = index - math.mul(y, MapSizeJob);
 
-            float amplitude = 1;
-            float frequency = 1;
-            float noiseHeight = 0;
+            float _amplitude = 1;
+            float _frequency = 1;
+            float _noiseHeight = 0;
             //Not needed in parallel! it's a layering of noise so it must be done contigiously
             for (int i = 0; i < OctavesJob; i++)
             {
-                float sampleX = math.mul((x - halfMapSize) / ScaleJob, frequency) + octOffsetArray[i].x;
-                float sampleY = math.mul((y - halfMapSize) / ScaleJob, frequency) + octOffsetArray[i].y;
+                float sampleX = math.mul((x - _halfMapSize) / ScaleJob, _frequency) + OctOffsetArray[i].x;
+                float sampleY = math.mul((y - _halfMapSize) / ScaleJob, _frequency) + OctOffsetArray[i].y;
                 float2 sampleXY = new float2(sampleX, sampleY);
 
                 float pNoiseValue = snoise(sampleXY);
-                noiseHeight = math.mad(pNoiseValue, amplitude, noiseHeight);
+                _noiseHeight = math.mad(pNoiseValue, _amplitude, _noiseHeight);
                 //lacunarity: controls increase in frequency of octaves
                 //Persistance : controls decrease in amplitude of octaves
-                amplitude = math.mul(amplitude, PersistanceJob);
-                frequency = math.mul(frequency, LacunarityJob);
+                _amplitude = math.mul(_amplitude, PersistanceJob);
+                _frequency = math.mul(_frequency, LacunarityJob);
             }
 
-            if (noiseHeight > maxNoiseHeight)
+            if (_noiseHeight > _maxNoiseHeight)
             {
-                maxNoiseHeight = noiseHeight;
+                _maxNoiseHeight = _noiseHeight;
             }
-            else if (noiseHeight < minNoiseHeight)
+            else if (_noiseHeight < _minNoiseHeight)
             {
-                minNoiseHeight = noiseHeight;
+                _minNoiseHeight = _noiseHeight;
             }
-            noiseMap[index] = noiseHeight;
+            NoiseMap[index] = _noiseHeight;
             //noiseMap[math.mad(y, MapSizeJob, x)] = noiseHeight;
+        }
+    }
+
+    /// <summary>
+    /// Process RandomJob
+    /// </summary>
+    [BurstCompile(CompileSynchronously = true)]
+    public struct UnLerpNoiseHeightMapJob : IJobParallelFor
+    {
+        [ReadOnly] public int MapSizeJob;
+        [ReadOnly] public float MaxNoiseHeightJob; //taken from NoiseHeightMapJob
+        [ReadOnly] public float MinNoiseHeightJob; //taken from NoiseHeightMapJob
+        public NativeArray<float> NoiseMap;
+
+        public void Execute(int index)
+        {
+            //int y = (int)math.floor(index / MapSizeJob);
+            //int x = index - math.mul(y, MapSizeJob);
+            NoiseMap[index] = math.unlerp(MinNoiseHeightJob, MaxNoiseHeightJob, NoiseMap[index]);
         }
     }
     //.Schedule(Data.Length, DEFAULT_BATCH_COUNT, dependency)
