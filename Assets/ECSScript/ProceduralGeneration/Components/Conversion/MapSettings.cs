@@ -29,7 +29,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             #endregion Check Values
             dstManager.AddComponent<Tag.MapSettings>(entity);
 
-            dstManager.AddComponent<DynamicBuffer.HeightMap.NoiseMap>(entity);
+            dstManager.AddComponent<DynamicBuffer.HeightMap>(entity);
 
             dstManager.AddComponentData(entity, new MapSett.MapSize {Value = _mapSize});
             dstManager.AddComponentData(entity, new MapSett.Octaves { Value = _octaves });

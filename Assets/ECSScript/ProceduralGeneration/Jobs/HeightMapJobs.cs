@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -39,17 +40,12 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
         [ReadOnly] public float ScaleJob;
         [ReadOnly] public NativeArray<float2> OctOffsetArray;
 
-        [NativeDisableParallelForRestriction]
-        [WriteOnly] public NativeArray<float> MinMaxHeightJob;
 
         [NativeDisableParallelForRestriction]
         [WriteOnly] public NativeArray<float> NoiseMap;
+
         public void Execute(int index)
         {
-            //FOR LOOP
-            float _maxNoiseHeight = float.MinValue;
-            float _minNoiseHeight = float.MaxValue;
-
             float _halfMapSize = MapSizeJob / 2f;
 
             int y = (int)math.floor(index / MapSizeJob);
@@ -70,19 +66,10 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
                 _amplitude = math.mul(_amplitude, PersistanceJob);
                 _frequency = math.mul(_frequency, LacunarityJob);
             }
-
-            if (_noiseHeight > _maxNoiseHeight)
-            {
-                _maxNoiseHeight = _noiseHeight;
-                MinMaxHeightJob[1] = _maxNoiseHeight;
-            }
-            else if (_noiseHeight < _minNoiseHeight)
-            {
-                _minNoiseHeight = _noiseHeight;
-                MinMaxHeightJob[0] = _minNoiseHeight;
-            }
             NoiseMap[index] = _noiseHeight;
         }
+
+
     }
 
     /// <summary>
@@ -92,13 +79,15 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
     public struct UnLerpNoiseHeightMapJob : IJobParallelFor
     {
         [ReadOnly] public int MapSizeJob;
-        [ReadOnly] public NativeArray<float> MinMaxHeightJob; // min = 0 : max = 1;
+        //[ReadOnly] public NativeArray<float> MinMaxHeightJob; // min = 0 : max = 1;
+        [ReadOnly] public float MinJob;
+        [ReadOnly] public float MaxJob;
 
         public NativeArray<float> NoiseMap;
 
         public void Execute(int index)
         {
-            NoiseMap[index] = math.unlerp(MinMaxHeightJob[0], MinMaxHeightJob[1], NoiseMap[index]);
+            NoiseMap[index] = math.unlerp(MinJob, MaxJob, NoiseMap[index]);
         }
     }
 }

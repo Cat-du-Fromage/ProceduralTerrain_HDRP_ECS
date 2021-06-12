@@ -2,6 +2,7 @@ using System;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 
 namespace KaizerwaldCode.ProceduralGeneration.Data
 {
@@ -43,11 +44,22 @@ namespace KaizerwaldCode.ProceduralGeneration.Data
         }
     }
 
-    namespace DynamicBuffer.HeightMap
+    namespace DynamicBuffer
     {
-        public struct NoiseMap : IBufferElementData
+        public struct HeightMap : IBufferElementData
         {
             public float Value;
+        }
+
+        public struct ColorMap : IBufferElementData
+        {
+            public MaterialColor Value;
+        }
+
+        public struct Regions : IBufferElementData
+        {
+            public float Height;
+            public MaterialColor Color;
         }
     }
 }

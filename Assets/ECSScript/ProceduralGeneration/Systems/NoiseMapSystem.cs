@@ -1,3 +1,4 @@
+using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -6,7 +7,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using MapJobs = KaizerwaldCode.ProceduralGeneration.Jobs;
 using MapSett = KaizerwaldCode.ProceduralGeneration.Data.PerlinNoise;
-using BufferHeightMap = KaizerwaldCode.ProceduralGeneration.Data.DynamicBuffer.HeightMap;
+using BufferHeightMap = KaizerwaldCode.ProceduralGeneration.Data.DynamicBuffer;
 using UnityEngine;
 
 namespace KaizerwaldCode.ProceduralGeneration.System
@@ -61,23 +62,26 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 LacunarityJob = GetComponent<MapSett.Lacunarity>(_mapSettings).Value,
                 NoiseMap = _noiseMapNativeArray,
                 OctOffsetArray = _octaveOffsetNativeArray,
-                MinMaxHeightJob = _minMaxHeightNativeArray,
+                //MinMaxHeightJob = _minMaxHeightNativeArray,
             };
             JobHandle _noiseHeightMapJobHandle = _noiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 250, _noiseRandomJobHandle);
-
+            _noiseHeightMapJobHandle.Complete();
             /*========================
              * Inverse Lerp Perlin Noise Job
              * return : inverse lerp NoiseMap
              ========================*/
+            
             MapJobs.UnLerpNoiseHeightMapJob _unLerpNoiseHeightMapJob = new MapJobs.UnLerpNoiseHeightMapJob()
             {
                 MapSizeJob = GetComponent<MapSett.MapSize>(_mapSettings).Value,
                 NoiseMap = _noiseMapNativeArray,
-                MinMaxHeightJob = _minMaxHeightNativeArray,
+                //MinMaxHeightJob = _minMaxHeightNativeArray,
+                MinJob = _noiseMapNativeArray.Min(),
+                MaxJob = _noiseMapNativeArray.Max(),
             };
             JobHandle _unLerpNoiseHeightMapJobHandle = _unLerpNoiseHeightMapJob.Schedule(_noiseMapNativeArray.Length, 250, _noiseHeightMapJobHandle);
             _unLerpNoiseHeightMapJobHandle.Complete(); // doc is lying : .Run() do not force previous job to complete
-
+            
             /*========================
              * Pass Noise Map to DynamicBuffer
              * Process : NoiseMap stored
@@ -88,10 +92,10 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 .WithName("NoiseMapToBuffer")
                 .WithoutBurst()
                 .WithStructuralChanges()
-                .ForEach((Entity Map, ref DynamicBuffer<BufferHeightMap.NoiseMap> noiseMap) =>
+                .ForEach((Entity Map, ref DynamicBuffer<BufferHeightMap.HeightMap> noiseMap) =>
                 {
                     noiseMap.Reinterpret<float>().CopyFrom(_noiseMapNativeArray);
-                    noiseMap.Reinterpret<BufferHeightMap.NoiseMap>();
+                    noiseMap.Reinterpret<BufferHeightMap.HeightMap>();
                     _em.RemoveComponent<Data.Event.MapSettingsConverted>(GetSingletonEntity<Data.Event.MapSettingsConverted>());
                     _em.AddComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
                 }).Run();

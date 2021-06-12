@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2161.9844, g: 2267.582, b: 3310.3672, a: 1}
+  m_IndirectSpecularColor: {r: 2162.3086, g: 2268.4258, b: 3313.504, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -168,11 +168,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13
+      value: 66
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.9
+      value: -393
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalRotation.w
@@ -530,10 +530,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4451af516efab34aad22a9c08867169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapSize: 2000
-  _seed: 45
-  _octaves: 4
-  _scale: 50
+  _mapSize: 1000
+  _seed: 68
+  _octaves: 5
+  _scale: 100
   _lacunarity: 2
   _persistance: 0.5
   _offset:
@@ -552,22 +552,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3f5a25e7981a93419a7a86968be0975, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OceanColor: {r: 0.18111429, g: 0.327919, b: 0.6981132, a: 0}
-  Ocean: 0
-  CoastColor: {r: 0.3329477, g: 0.5695915, b: 0.8113208, a: 0}
-  Coast: 0
-  SandColor: {r: 0, g: 0, b: 0, a: 0}
-  Sand: 0
-  PlainColor: {r: 0, g: 0, b: 0, a: 0}
-  Plain: 0
-  ForestColor: {r: 0, g: 0, b: 0, a: 0}
-  Forest: 0
-  TundraColor: {r: 0, g: 0, b: 0, a: 0}
-  Tundra: 0
-  MountainColor: {r: 0, g: 0, b: 0, a: 0}
-  Mountain: 0
-  SnowColor: {r: 0, g: 0, b: 0, a: 0}
-  Snow: 0
+  _terrains:
+  - height: 0.35
+    colour: {r: 0.15250975, g: 0.3727773, b: 0.7924528, a: 0}
+  - height: 0.45
+    colour: {r: 0.23143466, g: 0.58193094, b: 0.6226415, a: 0}
+  - height: 0.52
+    colour: {r: 0.7924528, g: 0.76433563, b: 0.2870772, a: 0}
+  - height: 0.65
+    colour: {r: 0.25558373, g: 0.6320754, b: 0.19320041, a: 0}
+  - height: 0.7
+    colour: {r: 0.07597007, g: 0.41509432, b: 0.08737834, a: 0}
+  - height: 0.8
+    colour: {r: 0.2924528, g: 0.2714845, b: 0.2714845, a: 0}
+  - height: 0.9
+    colour: {r: 0.3018868, g: 0.2004984, b: 0.2004984, a: 0}
+  - height: 1
+    colour: {r: 1, g: 1, b: 1, a: 0}
 --- !u!1 &2010378700
 GameObject:
   m_ObjectHideFlags: 0
@@ -580,6 +581,8 @@ GameObject:
   - component: {fileID: 2010378703}
   - component: {fileID: 2010378702}
   - component: {fileID: 2010378701}
+  - component: {fileID: 2010378705}
+  - component: {fileID: 2010378706}
   m_Layer: 0
   m_Name: TerrainBase
   m_TagString: Untagged
@@ -620,7 +623,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: eca7f5657fc6c1842a96f856e401794e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -664,6 +667,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2010378705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010378700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7d7495833204790ba1d3a8755397f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConversionMode: 0
+--- !u!114 &2010378706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010378700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0845e752bfa14764f8bbb2855a1027c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1
