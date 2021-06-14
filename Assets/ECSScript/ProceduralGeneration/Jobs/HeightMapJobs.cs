@@ -47,7 +47,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
         public void Execute(int index)
         {
             float _halfMapSize = MapSizeJob / 2f;
-
+            
             int y = (int)math.floor(index / MapSizeJob);
             int x = index - math.mul(y, MapSizeJob);
 

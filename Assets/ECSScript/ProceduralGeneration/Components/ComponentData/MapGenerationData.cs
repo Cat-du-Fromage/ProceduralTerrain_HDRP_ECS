@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
+using UnityEngine;
 
 namespace KaizerwaldCode.ProceduralGeneration.Data
 {
@@ -11,6 +12,10 @@ namespace KaizerwaldCode.ProceduralGeneration.Data
     namespace PerlinNoise
     {
         public struct MapSize : IComponentData
+        {
+            public int Value;
+        }
+        public struct ChunkSize : IComponentData
         {
             public int Value;
         }

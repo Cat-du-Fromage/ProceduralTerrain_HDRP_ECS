@@ -7,4 +7,6 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Event
 {
     public struct MapSettingsConverted : IComponentData { }
     public struct NoiseMapCalculated : IComponentData { }
+    public struct ColorMapCalculated : IComponentData { }
+    public struct ChunksEntityCreated : IComponentData {}
 }

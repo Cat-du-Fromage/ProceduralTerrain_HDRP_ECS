@@ -8,6 +8,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
     public class MapSettings : MonoBehaviour, IConvertGameObjectToEntity
     {
         [SerializeField] int _mapSize;
+        [SerializeField] int _chunkSize;
         [SerializeField] int _seed;
         [SerializeField] int _octaves;
         [SerializeField] float _scale;
@@ -22,6 +23,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
         {
             #region Check Values
             _mapSize = _mapSize < 1 ? 1 : _mapSize;
+            _chunkSize = _chunkSize > _mapSize || _chunkSize == 0 ? _mapSize : _chunkSize;
             _seed = _seed <= 0 ? 1 : _seed;
             _octaves = _octaves <= 0 ? 1 : _octaves;
             _scale = _scale <= 0 ? 0.0001f : _scale;
@@ -32,6 +34,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             dstManager.AddComponent<DynamicBuffer.HeightMap>(entity);
 
             dstManager.AddComponentData(entity, new MapSett.MapSize {Value = _mapSize});
+            dstManager.AddComponentData(entity, new MapSett.ChunkSize { Value = _chunkSize });
             dstManager.AddComponentData(entity, new MapSett.Octaves { Value = _octaves });
             dstManager.AddComponentData(entity, new MapSett.Scale { Value = _scale });
             dstManager.AddComponentData(entity, new MapSett.Seed { Value = _seed });

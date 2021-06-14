@@ -6,5 +6,6 @@ using Unity.Mathematics;
 namespace KaizerwaldCode.ProceduralGeneration.Data.Tag
 {
     public struct MapSettings : IComponentData {}
-    public struct MapEventHolder:IComponentData {}
+    public struct MapEventHolder : IComponentData {}
+    public struct Chunk : IComponentData{}
 }

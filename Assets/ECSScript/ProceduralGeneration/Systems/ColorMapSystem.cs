@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Rendering;
 using MapJobs = KaizerwaldCode.ProceduralGeneration.Jobs;
 using MapSett = KaizerwaldCode.ProceduralGeneration.Data.PerlinNoise;
 
@@ -44,6 +45,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _em.GetBuffer<ColorMap>(_mapSettings).Reinterpret<ColorMap>();
             //for test
             #region TEST
+            
             Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
             texture2D.filterMode = FilterMode.Point;
             texture2D.wrapMode = TextureWrapMode.Clamp;
@@ -58,11 +60,51 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             };
             
             _em.AddComponentData(GetSingletonEntity<TerrainAuthoring>(), localToWorldScale);
+
+            //NEW MESH API
+            // Vertex buffer
+            /*
+            Mesh mesh = new Mesh();
+            var vertexCount = 40;
+            var bulletCount = 10;
+
+            var iarray = new NativeArray<uint>(vertexCount, Allocator.TempJob,
+                NativeArrayOptions.UninitializedMemory);
+            var varray = new NativeArray<float4>(bulletCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            for (int i = 0; i < varray.Length; i++)
+            {
+                varray[i]= new float4(i, i+3, i+2, i+1);
+            }
+
+            for (int i = 0; i < iarray.Length; i++)
+            {
+                iarray[i] = (uint)i;
+            }
+
+            mesh.SetVertexBufferParams
+            (vertexCount,
+                new VertexAttributeDescriptor(VertexAttribute.Position,
+                    VertexAttributeFormat.Float32, 3),
+                new VertexAttributeDescriptor(VertexAttribute.TexCoord0,
+                    VertexAttributeFormat.Float32, 3));
+            mesh.SetVertexBufferData(varray, 0, 0, bulletCount);
+            // Index buffer
+            mesh.SetIndexBufferParams(vertexCount, IndexFormat.UInt32);
+            mesh.SetIndexBufferData(iarray, 0, 0, vertexCount);
+
+            // Submesh definition
+            var meshDesc = new SubMeshDescriptor(0, vertexCount, MeshTopology.Quads);
+            mesh.SetSubMesh(0, meshDesc, MeshUpdateFlags.DontRecalculateBounds);
+
+            varray.Dispose();
+            iarray.Dispose();
+            */
             #endregion TEST
-
-            _em.RemoveComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
-
             _colorMapNativeArray.Dispose();
+            #region EVENT
+            _em.RemoveComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            _em.AddComponent<Data.Event.ColorMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            #endregion EVENT
         }
 
         protected override void OnDestroy()
