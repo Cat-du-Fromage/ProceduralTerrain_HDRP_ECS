@@ -31,9 +31,9 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             EntityArchetype _chunkArchetype = _em.CreateArchetype
             (
                 typeof(Data.Tag.Chunk),
-                typeof(RenderMesh),
+                //typeof(RenderMesh),
                 typeof(LocalToWorld),
-                typeof(RenderBounds),
+                //typeof(RenderBounds),
                 typeof(ChunkData.MeshBuffer.Vertices),
                 typeof(ChunkData.MeshBuffer.Triangles),
                 typeof(ChunkData.MeshBuffer.Uvs),

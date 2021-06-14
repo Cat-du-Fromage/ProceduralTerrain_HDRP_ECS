@@ -1,6 +1,9 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.Animation;
+using Unity.Animation.Hybrid;
+using AnimationCurve = Unity.Animation.AnimationCurve;
 using MapSett = KaizerwaldCode.ProceduralGeneration.Data.PerlinNoise;
 namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
 {
@@ -18,6 +21,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
         [SerializeField] float2 _offset;
         [Range(0, 6)]
         [SerializeField] int _levelOfDetail;
+        [SerializeField] UnityEngine.AnimationCurve _animationCurve;
 
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
@@ -42,7 +46,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             dstManager.AddComponentData(entity, new MapSett.Persistance { Value = _persistance });
             dstManager.AddComponentData(entity, new MapSett.Offset { Value = _offset });
             dstManager.AddComponentData(entity, new MapSett.LevelOfDetail { Value = _levelOfDetail });
-
+            dstManager.AddComponentData(entity, new MapSett.HeightCurve { Value = _animationCurve.ToDotsAnimationCurve() });
             //Create Event Holder with a the Event "MapSettingsConverted"
             Entity MapEventHolder = dstManager.CreateEntity(typeof(Tag.MapEventHolder),typeof(Event.MapSettingsConverted));
             dstManager.SetName(MapEventHolder, "MapEventHolder");

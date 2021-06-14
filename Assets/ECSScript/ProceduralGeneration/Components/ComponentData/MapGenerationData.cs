@@ -3,7 +3,9 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
+using Unity.Animation;
 using UnityEngine;
+using AnimationCurve = Unity.Animation.AnimationCurve;
 
 namespace KaizerwaldCode.ProceduralGeneration.Data
 {
@@ -46,6 +48,11 @@ namespace KaizerwaldCode.ProceduralGeneration.Data
         public struct LevelOfDetail : IComponentData
         {
             public int Value;
+        }
+
+        public struct HeightCurve : IComponentData
+        {
+            public AnimationCurve Value;
         }
     }
 
