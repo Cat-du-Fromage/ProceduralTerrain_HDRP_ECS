@@ -45,6 +45,11 @@ namespace KaizerwaldCode.ProceduralGeneration.Data
         {
             public float2 Value;
         }
+
+        public struct HeightMultiplier : IComponentData
+        {
+            public float Value;
+        }
         public struct LevelOfDetail : IComponentData
         {
             public int Value;

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2157.3438, g: 2261.5684, b: 3300.0117, a: 1}
+  m_IndirectSpecularColor: {r: 2166.711, g: 2278.914, b: 3345.7266, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -626,9 +626,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4451af516efab34aad22a9c08867169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapSize: 1000
+  _mapSize: 4000
   _chunkSize: 200
-  _seed: 68
+  _seed: 12
   _octaves: 4
   _scale: 300
   _lacunarity: 2
@@ -636,7 +636,14 @@ MonoBehaviour:
   _offset:
     x: 2.44
     y: 21.21
+  _heightMultiplier: 4.23
   _levelOfDetail: 0
+  _animationCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &1265513484
 MonoBehaviour:
   m_ObjectHideFlags: 0

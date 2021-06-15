@@ -19,6 +19,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
         [Range(0,1)]
         [SerializeField] float _persistance;
         [SerializeField] float2 _offset;
+        [SerializeField] float _heightMultiplier;
         [Range(0, 6)]
         [SerializeField] int _levelOfDetail;
         [SerializeField] UnityEngine.AnimationCurve _animationCurve;
@@ -32,6 +33,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             _octaves = _octaves <= 0 ? 1 : _octaves;
             _scale = _scale <= 0 ? 0.0001f : _scale;
             _lacunarity = _lacunarity < 1f ? 1f : _lacunarity;
+            _heightMultiplier = _heightMultiplier < 1f ? 1f : _heightMultiplier;
             #endregion Check Values
             dstManager.AddComponent<Tag.MapSettings>(entity);
 
@@ -45,6 +47,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             dstManager.AddComponentData(entity, new MapSett.Lacunarity { Value = _lacunarity });
             dstManager.AddComponentData(entity, new MapSett.Persistance { Value = _persistance });
             dstManager.AddComponentData(entity, new MapSett.Offset { Value = _offset });
+            dstManager.AddComponentData(entity, new MapSett.HeightMultiplier { Value = _heightMultiplier });
             dstManager.AddComponentData(entity, new MapSett.LevelOfDetail { Value = _levelOfDetail });
             dstManager.AddComponentData(entity, new MapSett.HeightCurve { Value = _animationCurve.ToDotsAnimationCurve() });
             //Create Event Holder with a the Event "MapSettingsConverted"
