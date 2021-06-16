@@ -116,7 +116,7 @@ float unlerp(float a, float b, float x)
     return (x - a) / (b - a);
 }
 
-[numthreads(8, 8, 1)]//Dimension of threadGroup (x,y,z) In our case it's a 2D array
+[numthreads(32, 32, 1)]//Dimension of threadGroup (x,y,z) In our case it's a 2D array
 void CSHeightMap(uint3 id : SV_DispatchThreadID)
 {
     float _halfMapSize = _mapSizeCSH / 2.0;
@@ -146,11 +146,13 @@ void CSHeightMap(uint3 id : SV_DispatchThreadID)
 
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(32, 32, 1)]
 void CSHeightMapInverseLerp(uint3 id : SV_DispatchThreadID)
 {
-    float UnLerpedHeightMap = unlerp(_minHeightCSH, _maxHeightCSH, _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x]);
-    _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = UnLerpedHeightMap > 1.0 ? 1.0 : UnLerpedHeightMap;
-    //_heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = unlerp(_minHeightCSH, _maxHeightCSH, _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x]);
-
+    if (id.y < (uint)_mapSizeCSH && id.x < (uint)_mapSizeCSH)
+    {
+        float UnLerpedHeightMap = unlerp(_minHeightCSH, _maxHeightCSH, _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x]);
+        _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = UnLerpedHeightMap > 1.0 ? 1.0 : UnLerpedHeightMap;
+        //_heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = unlerp(_minHeightCSH, _maxHeightCSH, _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x]);
+    }
 }

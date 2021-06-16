@@ -6,6 +6,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using MapJobs = KaizerwaldCode.ProceduralGeneration.Jobs;
@@ -45,12 +46,27 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _em.GetBuffer<ColorMap>(_mapSettings).Reinterpret<ColorMap>();
 
             #region ColorMap Compute Shader
+            ComputeShader _colorMapComputeShader = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/ECSScript/ProceduralGeneration/ComputeShader/ColorMapComputeShader.compute");
+            Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
+            float[] _heightMapArray = GetBuffer<HeightMap>(_mapSettings).AsNativeArray().Reinterpret<float>().ToArray(); //mmmh this seems bad, need some check
 
+            //OffsetArray To ComputeBuffer
+            ComputeBuffer _colorsBuffer = new ComputeBuffer(_colorMapNativeArray.Length, sizeof(float) * 4);
+            _colorsBuffer.SetData(_colorMapNativeArray);
+            _colorMapComputeShader.SetBuffer(0, "_mapTextureCSH", _colorsBuffer);
+
+            //HeightMapArray To ComputeBuffer
+            ComputeBuffer _heightMapBuffer = new ComputeBuffer(GetBuffer<HeightMap>(_mapSettings).Length, sizeof(float));
+            _heightMapBuffer.SetData(_heightMapArray);
+            _colorMapComputeShader.SetBuffer(0, "_heightMapArrCSH", _heightMapBuffer);
+
+            _colorsBuffer.Release();
+            _heightMapBuffer.Release();
             #endregion ColorMap Compute Shader
-            //for test
+                        //for test
             #region TEST
 
-            Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
+            //Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
             texture2D.filterMode = FilterMode.Point;
             texture2D.wrapMode = TextureWrapMode.Clamp;
             texture2D.SetPixels(_colorMapNativeArray.Reinterpret<Color>().ToArray());

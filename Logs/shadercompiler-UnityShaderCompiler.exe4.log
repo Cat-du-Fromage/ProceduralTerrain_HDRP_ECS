@@ -2,27 +2,7 @@ Base path: 'C:/Program Files/Unity/Hub/Editor/2020.3.5f1/Editor/Data', plugins p
 Cmd: initializeCompiler
 
 Cmd: compileComputeKernel
-  insize=5228 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMap cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0  error: 1 plat 4 at HeightMapComputeShader.compute(127): integer modulus may be much slower, try using uints if possible.
- ok=1 outsize=3548
-
-Cmd: compileComputeKernel
-  insize=5226 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMapInverseLerp cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=772
-
-Cmd: compileComputeKernel
-  insize=5230 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMapInverseLerp cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=772
-
-Cmd: compileComputeKernel
-  insize=5238 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMap cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=3252
-
-Cmd: compileComputeKernel
-  insize=5234 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMapInverseLerp cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=772
-
-Cmd: compileComputeKernel
-  insize=5250 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMapInverseLerp cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=772
-
-Cmd: compileComputeKernel
-  insize=5101 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute kernel=CSHeightMap cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0 ok=1 outsize=3324
+  insize=883 file=C:/UnityProgramme/ECS/ProceduralTerrain_HDRP_ECS/Assets/ECSScript/ProceduralGeneration/ComputeShader/ColorMapComputeShader.compute kernel=CSColorMap cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=19 km=<UNITY_VERSION=202035> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_FULL_HDR uKW=SHADER_STAGE_COMPUTE platform=d3d11 flags=0  error: 2 plat 4 at ColorMapComputeShader.compute(18): invalid type for index - index must be a scalar, or a vector with the correct number of dimensions
+ ok=0 outsize=0
 
 Cmd: shutdown
-
-Quitting shader compiler process
