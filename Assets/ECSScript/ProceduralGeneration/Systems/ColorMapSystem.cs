@@ -43,9 +43,13 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             _em.GetBuffer<ColorMap>(_mapSettings).Reinterpret<MaterialColor>().CopyFrom(_colorMapNativeArray);
             _em.GetBuffer<ColorMap>(_mapSettings).Reinterpret<ColorMap>();
+
+            #region ColorMap Compute Shader
+
+            #endregion ColorMap Compute Shader
             //for test
             #region TEST
-            
+
             Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
             texture2D.filterMode = FilterMode.Point;
             texture2D.wrapMode = TextureWrapMode.Clamp;

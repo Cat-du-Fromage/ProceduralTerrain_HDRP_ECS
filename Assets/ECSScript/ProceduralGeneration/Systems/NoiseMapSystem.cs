@@ -92,7 +92,8 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _heightMapComputeShader.SetFloat("_scaleCSH", GetComponent<MapSett.Scale>(_mapSettings).Value);
 
             //Dispatch ThreadGroup
-            int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / 32f);
+            int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / 8f);
+            Debug.Log($"thread dispatch {_threadGroups}");
             _heightMapComputeShader.Dispatch(_heightMapKernel, _threadGroups, _threadGroups, 1);
 
             _heightMapBuffer.GetData(_heightMapArr);

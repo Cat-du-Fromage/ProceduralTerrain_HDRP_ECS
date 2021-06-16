@@ -1,0 +1,13 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSColorMap
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> _mapTextureCSH;
+StructuredBuffer<float4> _materialColorArrCSH;
+
+[numthreads(8,8,1)]
+void CSColorMap(uint3 id : SV_DispatchThreadID)
+{
+    _mapTextureCSH[id.xy] = _materialColorArrCSH[id.xy];
+}
