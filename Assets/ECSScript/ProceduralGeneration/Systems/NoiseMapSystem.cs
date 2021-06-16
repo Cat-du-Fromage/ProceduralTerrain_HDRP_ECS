@@ -57,11 +57,11 @@ namespace KaizerwaldCode.ProceduralGeneration.System
              * Perlin Noise Compute Shader
              * return : NoiseMap
              ========================*/
-            //Tester : AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader");
-            //ComputeShader _heightMapComputeShader = Resources.Load<ComputeShader>("ComputeShader/ProceduralGeneration/HeightMapComputeShader");
             ComputeShader _heightMapComputeShader = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute");
             int _heightMapKernel = _heightMapComputeShader.FindKernel("CSHeightMap");
             int _heightMapInverseKernel = _heightMapComputeShader.FindKernel("CSHeightMapInverseLerp");
+            float _numThreadsGPU = 32f;
+            int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / _numThreadsGPU);
             //AsyncGPUReadback Dispose Native array on Call and buffer.GetData don't accept NativeArray...
             //So we have to construct array to retrieve our data
             float[] _heightMapArr = new float[_mapSurface];
@@ -92,7 +92,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _heightMapComputeShader.SetFloat("_scaleCSH", GetComponent<MapSett.Scale>(_mapSettings).Value);
 
             //Dispatch ThreadGroup
-            int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / 32f);
             Debug.Log($"thread dispatch {_threadGroups}");
             _heightMapComputeShader.Dispatch(_heightMapKernel, _threadGroups, _threadGroups, 1);
 
@@ -131,7 +130,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             //Conversion to NativeArray
             _noiseMapNativeArray.CopyFrom(_heightMapArr);
-            Debug.Log(_noiseMapNativeArray.Max());
+            //Debug.Log(_noiseMapNativeArray.Max());
 
             #endregion Inverse Lerp Noise Map
 
