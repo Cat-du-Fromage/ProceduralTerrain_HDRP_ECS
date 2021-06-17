@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using KaizerwaldCode.ProceduralGeneration.Data.DynamicBuffer;
 using Unity.Burst;
 using Unity.Collections;
@@ -70,6 +71,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / _numThreadsGPU);
             _colorMapComputeShader.Dispatch(0, _threadGroups, _threadGroups,1);
 
+            //releaseBuffer
             _heightMapBuffer.Release();
             _regionsColorBuffer.Release();
             _regionsHeightBuffer.Release();
