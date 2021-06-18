@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using MapJobs = KaizerwaldCode.ProceduralGeneration.Jobs;
 using MapSett = KaizerwaldCode.ProceduralGeneration.Data.PerlinNoise;
+using KaizerwaldCode.Utils;
 
 namespace KaizerwaldCode.ProceduralGeneration.System
 {
@@ -57,15 +58,15 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _colorMapComputeShader.SetFloat("_heightMapLength", _mapSurface);
             //_regionHeightBuffer To ComputeBuffer
             ComputeBuffer _regionsHeightBuffer = new ComputeBuffer(_regionsHeightArray.Length, sizeof(float));
-            CSSetBuffer(_colorMapComputeShader, 0, "_regionsHeightArrCSH", _regionsHeightArray, _regionsHeightBuffer);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_regionsHeightArrCSH", _regionsHeightBuffer, _regionsHeightArray);
 
             //_regionColorBuffer To ComputeBuffer
             ComputeBuffer _regionsColorBuffer = new ComputeBuffer(_regionsColorArray.Length, sizeof(float) * 4);
-            CSSetBuffer(_colorMapComputeShader, 0, "_regionsColorArrCSH", _regionsColorArray, _regionsColorBuffer);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_regionsColorArrCSH", _regionsColorBuffer, _regionsColorArray);
 
             //HeightMapArray To ComputeBuffer
             ComputeBuffer _heightMapBuffer = new ComputeBuffer(GetBuffer<HeightMap>(_mapSettings).Length, sizeof(float));
-            CSSetBuffer(_colorMapComputeShader, 0, "_heightMapArrCSH", _heightMapArray, _heightMapBuffer);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_heightMapArrCSH", _heightMapBuffer, _heightMapArray);
 
             float _numThreadsGPU = 32f;
             int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / _numThreadsGPU);
@@ -83,7 +84,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             //Texture2D texture2D = new Texture2D(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
             texture2D.filterMode = FilterMode.Point;
             texture2D.wrapMode = TextureWrapMode.Clamp;
-            //texture2D.SetPixels(_colorMapNativeArray.Reinterpret<Color>().ToArray());
             RenderTexture.active = _renderTexture;
             texture2D.ReadPixels(new Rect(0, 0, _renderTexture.width, _renderTexture.height), 0, 0);
             texture2D.Apply();
@@ -107,12 +107,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         protected override void OnDestroy()
         {
             if (_colorMapNativeArray.IsCreated) _colorMapNativeArray.Dispose();
-        }
-
-        private void CSSetBuffer(ComputeShader computeShader, int kernel, string CSdata, Array array, ComputeBuffer computeBuffer)
-        {
-            computeBuffer.SetData(array);
-            computeShader.SetBuffer(kernel, CSdata, computeBuffer);
         }
     }
 }
