@@ -18,7 +18,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 {
     public class NoiseMapSystem : SystemBase
     {
-        NativeArray<float> _noiseMapNativeArray;
         NativeArray<float2> _octaveOffsetNativeArray;
 
         EntityManager _em;
@@ -39,7 +38,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             float[] _heightMapArr = new float[_mapSurface];
             int[] _minMaxHeight = new int[2]; // Int beacause of interlockMin/max don't accept float
-            int _floatToIntMultiplier = 1000; // needed for interlock function that can only take int (so we make float*1000)
+            int _floatToIntMultiplier = 1000; // needed for interlock function that can only take int (so we make float*1000 inside compute shader function)
 
             //Load compute shader
             ComputeShader _heightMapComputeShader = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/ECSScript/ProceduralGeneration/ComputeShader/HeightMapComputeShader.compute");
@@ -49,7 +48,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             /*========================
              *Native Array declaration
              ========================*/
-            //_noiseMapNativeArray = new NativeArray<float>(_mapSurface, Allocator.TempJob);
             _octaveOffsetNativeArray = new NativeArray<float2>(GetComponent<MapSett.Octaves>(_mapSettings).Value, Allocator.Persistent);
             /*========================
              * Random octaves Offset Job
@@ -97,10 +95,9 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _heightMapComputeShader.SetFloat("_scaleCSH", GetComponent<MapSett.Scale>(_mapSettings).Value);
 
             //Dispatch ThreadGroup
-            var _requestAsyncGPUHeightMap = await AsyncGPUHeightMap(_heightMapComputeShader, _heightMapKernel, _threadGroups, _heightMapBuffer, _minMaxBuffer);
+            (float[], int[]) _requestAsyncGPUHeightMap = await AsyncGPUHeightMap(_heightMapComputeShader, _heightMapKernel, _threadGroups, _heightMapBuffer, _minMaxBuffer);
             _heightMapArr = _requestAsyncGPUHeightMap.Item1;
             _minMaxHeight = _requestAsyncGPUHeightMap.Item2;
-            Debug.Log($"thread dispatch {_threadGroups}");
 
             _heightMapBuffer.Release();
             _offsetsBuffer.Release();
@@ -122,10 +119,8 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             float _min = (float)_minMaxHeight[0] / (float)_floatToIntMultiplier;
             float _max = (float)_minMaxHeight[1] / (float)_floatToIntMultiplier;
 
-            Debug.Log($"min = {_min} ; max = {_max}");
             _heightMapComputeShader.SetFloat("_minHeightCSH", _min);
             _heightMapComputeShader.SetFloat("_maxHeightCSH", _max);
-
             _heightMapArr = await AsyncGPUHeightMapUnLerp(_heightMapComputeShader, _heightMapInverseKernel, _threadGroups, _heightMapInverseBuffer);
 
             _heightMapInverseBuffer.Release();
@@ -140,7 +135,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
              ========================*/
             _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<float>().CopyFrom(_heightMapArr);
             _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<BufferHeightMap.HeightMap>();
-            Debug.Log("WE ARE REMOVING");
             _em.RemoveComponent<Data.Event.MapSettingsConverted>(GetSingletonEntity<Data.Event.MapSettingsConverted>());
             _em.AddComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
         }
@@ -163,19 +157,14 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         private async Task<(float[], int[])> AsyncGPUHeightMap(ComputeShader computeShader, int kernel, int threadGroups, ComputeBuffer computeBufferHeightMap, ComputeBuffer computeBufferMineMax)
         {
             computeShader.Dispatch(kernel, threadGroups, threadGroups, 1);
-
             AsyncGPUReadbackRequest requestHeightMap = AsyncGPUReadback.Request(computeBufferHeightMap);
             AsyncGPUReadbackRequest requestMinMax = AsyncGPUReadback.Request(computeBufferMineMax);
-
             while ((!requestHeightMap.done && !requestHeightMap.hasError) && (!requestMinMax.done && !requestMinMax.hasError))
             {
                 await Task.Yield();
             }
-
             NativeArray<float> _heightMapNativeArray = requestHeightMap.GetData<float>(0);
             NativeArray<int> _minMaxNativeArray = requestMinMax.GetData<int>();
-            Debug.Log($"TASK YIELD FINISHED! {_minMaxNativeArray[0]} + {_minMaxNativeArray[1]}");
-
             return (_heightMapNativeArray.ToArray(), _minMaxNativeArray.ToArray());
         }
         /// <summary>
@@ -190,17 +179,12 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         private async Task<float[]> AsyncGPUHeightMapUnLerp(ComputeShader computeShader, int kernel, int threadGroups, ComputeBuffer computeBufferHeightMap)
         {
             computeShader.Dispatch(kernel, threadGroups, threadGroups, 1);
-
             AsyncGPUReadbackRequest requestHeightMap = AsyncGPUReadback.Request(computeBufferHeightMap);
-
             while ((!requestHeightMap.done && !requestHeightMap.hasError))
             {
                 await Task.Yield();
             }
-
             NativeArray<float> _heightMapNativeArray = requestHeightMap.GetData<float>(0);
-            Debug.Log($"UNLERP TASK YIELD FINISHED!");
-
             return _heightMapNativeArray.ToArray();
         }
 
@@ -208,7 +192,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
         protected override void OnDestroy()
         {
-            if (_noiseMapNativeArray.IsCreated) _noiseMapNativeArray.Dispose();
             if (_octaveOffsetNativeArray.IsCreated) _octaveOffsetNativeArray.Dispose();
         }
     }

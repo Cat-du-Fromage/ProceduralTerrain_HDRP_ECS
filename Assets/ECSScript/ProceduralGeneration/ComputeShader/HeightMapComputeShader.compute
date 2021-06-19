@@ -24,7 +24,6 @@ float _maxHeightCSH;
 void CSHeightMap(uint3 id : SV_DispatchThreadID)
 {
     float _halfMapSize = _mapSizeCSH / 2.0;
-
 	if(id.y < (uint)_mapSizeCSH && id.x < (uint)_mapSizeCSH)
 	{
         float _amplitude = 1;
