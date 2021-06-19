@@ -23,7 +23,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
         public void Execute(int index)
         {
             float _offsetX = RandomJob.NextInt(-100000, 100000) + OffsetJob.x;
-            float _offsetY = RandomJob.NextInt(-100000, 100000) + OffsetJob.y;
+            float _offsetY = RandomJob.NextInt(-100000, 100000) - OffsetJob.y;
             OctOffsetArrayJob[index] = new float2(_offsetX, _offsetY);
         }
     }
@@ -57,8 +57,8 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
             //Not needed in parallel! it's a layering of noise so it must be done contigiously
             for (int i = 0; i < OctavesJob; i++)
             {
-                float sampleX = math.mul((x - _halfMapSize) / ScaleJob, _frequency) + OctOffsetArray[i].x;
-                float sampleY = math.mul((y - _halfMapSize) / ScaleJob, _frequency) + OctOffsetArray[i].y;
+                float sampleX = math.mul((x - _halfMapSize + OctOffsetArray[i].x) / ScaleJob, _frequency);
+                float sampleY = math.mul((y - _halfMapSize + OctOffsetArray[i].y) / ScaleJob, _frequency);
                 float2 sampleXY = new float2(sampleX, sampleY);
 
                 float pNoiseValue = snoise(sampleXY);

@@ -43,7 +43,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             float4[] _regionsColorArray = new float4[GetBuffer<Regions>(_mapSettings).Length];
             float[] _regionsHeightArray = new float[GetBuffer<Regions>(_mapSettings).Length];
 
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 for (int i = 0; i < GetBuffer<Regions>(_mapSettings).Length; i++)
                 {
@@ -79,7 +79,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _regionsHeightBuffer.Release();
             #endregion ColorMap Compute Shader
 
-            //for test
+            //for test : May need a refactor when Mesh construction completed
             #region TEST
             _renderTexture.wrapMode = TextureWrapMode.Clamp;
             _renderTexture.filterMode = FilterMode.Point;

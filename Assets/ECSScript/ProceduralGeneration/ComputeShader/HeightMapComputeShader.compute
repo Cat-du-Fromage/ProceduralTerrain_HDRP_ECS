@@ -32,8 +32,8 @@ void CSHeightMap(uint3 id : SV_DispatchThreadID)
 
         for (int i = 0; i < _octavesCSH; i++)
         {
-            float _sampleX = ((id.x - _halfMapSize) / _scaleCSH) * _frequency + _offsetsArrCSH[i].x;
-            float _sampleY = ((id.y - _halfMapSize) / _scaleCSH) * _frequency + _offsetsArrCSH[i].y;
+            float _sampleX = ((id.x - _halfMapSize + _offsetsArrCSH[i].x) / _scaleCSH) * _frequency;
+            float _sampleY = ((id.y - _halfMapSize + _offsetsArrCSH[i].y) / _scaleCSH) * _frequency;
 
             float _pNoiseValue = snoise(float2(_sampleX, _sampleY));
             _noiseHeight += _pNoiseValue * _amplitude;

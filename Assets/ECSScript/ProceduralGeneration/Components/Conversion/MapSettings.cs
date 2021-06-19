@@ -36,7 +36,6 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             _heightMultiplier = _heightMultiplier < 1f ? 1f : _heightMultiplier;
             #endregion Check Values
             dstManager.AddComponent<Tag.MapSettings>(entity);
-
             dstManager.AddComponent<DynamicBuffer.HeightMap>(entity);
 
             dstManager.AddComponentData(entity, new MapSett.MapSize {Value = _mapSize});
@@ -50,6 +49,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             dstManager.AddComponentData(entity, new MapSett.HeightMultiplier { Value = _heightMultiplier });
             dstManager.AddComponentData(entity, new MapSett.LevelOfDetail { Value = _levelOfDetail });
             dstManager.AddComponentData(entity, new MapSett.HeightCurve { Value = _animationCurve.ToDotsAnimationCurve() });
+
             //Create Event Holder with a the Event "MapSettingsConverted"
             Entity MapEventHolder = dstManager.CreateEntity(typeof(Tag.MapEventHolder),typeof(Event.MapSettingsConverted));
             dstManager.SetName(MapEventHolder, "MapEventHolder");
