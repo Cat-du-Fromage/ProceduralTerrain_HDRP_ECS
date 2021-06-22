@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -27,13 +28,13 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
             #region Check Values
-            _mapSize = _mapSize < 1 ? 1 : _mapSize;
+            math.max(1, _mapSize);
             _chunkSize = _chunkSize > _mapSize || _chunkSize == 0 ? _mapSize : _chunkSize;
-            _seed = _seed <= 0 ? 1 : _seed;
-            _octaves = _octaves <= 0 ? 1 : _octaves;
-            _scale = _scale <= 0 ? 0.0001f : _scale;
-            _lacunarity = _lacunarity < 1f ? 1f : _lacunarity;
-            _heightMultiplier = _heightMultiplier < 1f ? 1f : _heightMultiplier;
+            math.max(1, _seed);
+            math.max(1, _octaves);
+            math.max(0.0001f, _scale);
+            math.max(1f, _lacunarity);
+            math.max(1f, _heightMultiplier);
             #endregion Check Values
             dstManager.AddComponent<Tag.MapSettings>(entity);
             dstManager.AddComponent<DynamicBuffer.HeightMap>(entity);
@@ -53,6 +54,10 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             //Create Event Holder with a the Event "MapSettingsConverted"
             Entity MapEventHolder = dstManager.CreateEntity(typeof(Tag.MapEventHolder),typeof(Event.MapSettingsConverted));
             dstManager.SetName(MapEventHolder, "MapEventHolder");
+
+
+            Entity ChunksHolder = dstManager.CreateEntity(typeof(Tag.ChunksHolder), typeof(LinkedEntityGroup));
+            dstManager.SetName(ChunksHolder, "ChunksHolder");
         }
     }
 }

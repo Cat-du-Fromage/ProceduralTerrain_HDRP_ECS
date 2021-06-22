@@ -83,7 +83,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             #region TEST
             _renderTexture.wrapMode = TextureWrapMode.Clamp;
             _renderTexture.filterMode = FilterMode.Point;
-            Material material = _em.GetSharedComponentData<RenderMesh>(GetSingletonEntity<TerrainAuthoring>()).material;
+            Material material = _em.GetSharedComponentData<RenderMesh>(GetSingletonEntity<Data.Authoring.TerrainAuthoring>()).material;
             material.mainTexture = _renderTexture;
             //Set the correct Scale to the Mesh
             NonUniformScale localToWorldScale = new NonUniformScale
@@ -91,7 +91,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 Value = new float3(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value)
             };
 
-            _em.AddComponentData(GetSingletonEntity<TerrainAuthoring>(), localToWorldScale);
+            _em.AddComponentData(GetSingletonEntity<Data.Authoring.TerrainAuthoring>(), localToWorldScale);
             #endregion TEST
             #region EVENT
             _em.RemoveComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());

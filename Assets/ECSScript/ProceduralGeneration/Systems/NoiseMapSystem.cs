@@ -13,6 +13,7 @@ using MapJobs = KaizerwaldCode.ProceduralGeneration.Jobs;
 using MapSett = KaizerwaldCode.ProceduralGeneration.Data.PerlinNoise;
 using BufferHeightMap = KaizerwaldCode.ProceduralGeneration.Data.DynamicBuffer;
 using KaizerwaldCode.Utils;
+using Unity.Jobs.LowLevel.Unsafe;
 //REMOVE comments  Ctrl + k + u (c to put in comment)
 namespace KaizerwaldCode.ProceduralGeneration.System
 {
@@ -60,7 +61,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 OffsetJob = GetComponent<MapSett.Offset>(_mapSettings).Value,
                 OctOffsetArrayJob = _octaveOffsetNativeArray,
             };
-            JobHandle _noiseRandomJobHandle = _noiseRandomJob.Schedule(_octaveOffsetNativeArray.Length, 32);
+            JobHandle _noiseRandomJobHandle = _noiseRandomJob.Schedule(_octaveOffsetNativeArray.Length, JobsUtility.JobWorkerCount-1);
             //needed for compute shader => can't use dependency in this case
             _noiseRandomJobHandle.Complete();
             float2[] _octaveOffsetArr = _octaveOffsetNativeArray.ToArray();

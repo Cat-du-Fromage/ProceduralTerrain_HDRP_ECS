@@ -19,6 +19,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
         protected override void OnUpdate()
         {
+            /*
             // MapSize / Chunks Size
             int NumChunksRow = 0;
             // Chunks Size
@@ -46,8 +47,8 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                     //=============================================================
                 }
             }
-
             heightMap.Dispose();
+            */
             _em.RemoveComponent<Data.Event.ChunksEntityCreated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
         }
     }

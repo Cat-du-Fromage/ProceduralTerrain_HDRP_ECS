@@ -73,7 +73,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
     }
 
     /// <summary>
-    /// Process RandomJob
+    /// Unlerp HeightMap
     /// </summary>
     [BurstCompile(CompileSynchronously = true)]
     public struct UnLerpNoiseHeightMapJob : IJobParallelFor
