@@ -79,7 +79,6 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
     public struct UnLerpNoiseHeightMapJob : IJobParallelFor
     {
         [ReadOnly] public int MapSizeJob;
-        //[ReadOnly] public NativeArray<float> MinMaxHeightJob; // min = 0 : max = 1;
         [ReadOnly] public float MinJob;
         [ReadOnly] public float MaxJob;
 
@@ -88,6 +87,30 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
         public void Execute(int index)
         {
             NoiseMap[index] = math.unlerp(MinJob, MaxJob, NoiseMap[index]);
+        }
+    }
+
+    /// <summary>
+    /// FallOff, delimiter for the edge of th map
+    /// </summary>
+    [BurstCompile(CompileSynchronously = true)]
+    public struct FallOffJob : IJobParallelFor
+    {
+        [ReadOnly] public int MapSizeJob;
+
+        [WriteOnly]public NativeArray<float> FallOffMapJob;
+
+        public void Execute(int index)
+        {
+            int _row = (int)math.floor(index / MapSizeJob);
+            int _indexInRow = index - math.mul(_row, MapSizeJob);
+
+            float _y = math.mad(_row / (float)MapSizeJob, 2, -1);
+            float _x = math.mad(_indexInRow / (float)MapSizeJob, 2, -1);
+
+            float _value = math.max(math.abs(_y), math.abs(_x));
+
+            FallOffMapJob[index] = _value;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
     public class NoiseMapSystem : SystemBase
     {
         NativeArray<float2> _octaveOffsetNativeArray;
-
+        NativeArray<float> _fallOffNativeArray;
         EntityManager _em;
 
         protected override void OnCreate()
@@ -50,6 +50,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
              *Native Array declaration
              ========================*/
             _octaveOffsetNativeArray = new NativeArray<float2>(GetComponent<MapSett.Octaves>(_mapSettings).Value, Allocator.Persistent);
+            _fallOffNativeArray = new NativeArray<float>(_mapSurface, Allocator.Persistent);
             /*========================
              * Random octaves Offset Job
              * return : OctOffsetArrayJob
@@ -136,6 +137,9 @@ namespace KaizerwaldCode.ProceduralGeneration.System
              ========================*/
             _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<float>().CopyFrom(_heightMapArr);
             _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<BufferHeightMap.HeightMap>();
+
+            _fallOffNativeArray.Dispose();
+
             _em.RemoveComponent<Data.Event.MapSettingsConverted>(GetSingletonEntity<Data.Event.MapSettingsConverted>());
             _em.AddComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
         }
@@ -194,6 +198,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         protected override void OnDestroy()
         {
             if (_octaveOffsetNativeArray.IsCreated) _octaveOffsetNativeArray.Dispose();
+            if (_fallOffNativeArray.IsCreated) _fallOffNativeArray.Dispose();
         }
     }
 }
