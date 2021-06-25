@@ -4,47 +4,47 @@
 #include "..\..\..\Utils\ComputeShaderUtils\NoiseUtilsComputeShader.compute"
 #include "..\..\..\Utils\ComputeShaderUtils\MathUtilsComputeShader.compute"
 
-int _floatToIntMultiplierCSH;
-int _mapSizeCSH;
-int _octavesCSH;
-float _lacunarityCSH;
-float _persistenceCSH;
-float _scaleCSH;
+int floatToIntMultiplierCSH;
+int mapSizeCSH;
+int octavesCSH;
+float lacunarityCSH;
+float persistenceCSH;
+float scaleCSH;
 
-RWStructuredBuffer<float> _heightMapsArrCSH;
-RWStructuredBuffer<int> _minMaxArrCSH;
-StructuredBuffer<float2> _offsetsArrCSH;
+RWStructuredBuffer<float> heightMapsArrCSH;
+RWStructuredBuffer<int> minMaxArrCSH;
+StructuredBuffer<float2> offsetsArrCSH;
 
-RWStructuredBuffer<float> _heightMapsInverseArrCSH;
+RWStructuredBuffer<float> heightMapsInverseArrCSH;
 
-float _minHeightCSH;
-float _maxHeightCSH;
+float minHeightCSH;
+float maxHeightCSH;
 
 [numthreads(32, 32, 1)]//Dimension of threadGroup (x,y,z) In our case it's a 2D array
 void CSHeightMap(uint3 id : SV_DispatchThreadID)
 {
-    float _halfMapSize = _mapSizeCSH / 2.0;
-	if(id.y < (uint)_mapSizeCSH && id.x < (uint)_mapSizeCSH)
+    float _halfMapSize = mapSizeCSH / 2.0;
+	if(id.y < (uint)mapSizeCSH && id.x < (uint)mapSizeCSH)
 	{
         float _amplitude = 1;
         float _frequency = 1;
         float _noiseHeight = 0;
 
-        for (int i = 0; i < _octavesCSH; i++)
+        for (int i = 0; i < octavesCSH; i++)
         {
-            float _sampleX = ((id.x - _halfMapSize + _offsetsArrCSH[i].x) / _scaleCSH) * _frequency;
-            float _sampleY = ((id.y - _halfMapSize + _offsetsArrCSH[i].y) / _scaleCSH) * _frequency;
+            float _sampleX = ((id.x - _halfMapSize + offsetsArrCSH[i].x) / scaleCSH) * _frequency;
+            float _sampleY = ((id.y - _halfMapSize + offsetsArrCSH[i].y) / scaleCSH) * _frequency;
 
             float _pNoiseValue = snoise(float2(_sampleX, _sampleY));
             _noiseHeight += _pNoiseValue * _amplitude;
 
-            _amplitude *= _persistenceCSH;
-            _frequency *= _lacunarityCSH;
+            _amplitude *= persistenceCSH;
+            _frequency *= lacunarityCSH;
         }
-        _heightMapsArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = _noiseHeight;
-        int _valHeightMap = int(_heightMapsArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] * (uint)_floatToIntMultiplierCSH);
-		InterlockedMin(_minMaxArrCSH[0], _valHeightMap);
-		InterlockedMax(_minMaxArrCSH[1], _valHeightMap);
+        heightMapsArrCSH[(id.y * (uint)mapSizeCSH) + id.x] = _noiseHeight;
+        int _valHeightMap = int(heightMapsArrCSH[(id.y * (uint)mapSizeCSH) + id.x] * (uint)floatToIntMultiplierCSH);
+		InterlockedMin(minMaxArrCSH[0], _valHeightMap);
+		InterlockedMax(minMaxArrCSH[1], _valHeightMap);
 	}
 
 }
@@ -52,9 +52,9 @@ void CSHeightMap(uint3 id : SV_DispatchThreadID)
 [numthreads(32, 32, 1)]
 void CSHeightMapInverseLerp(uint3 id : SV_DispatchThreadID)
 {
-    if (id.y < (uint)_mapSizeCSH && id.x < (uint)_mapSizeCSH)
+    if (id.y < (uint)mapSizeCSH && id.x < (uint)mapSizeCSH)
     {
-        float UnLerpedHeightMap = unlerp(_minHeightCSH, _maxHeightCSH, _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x]);
-        _heightMapsInverseArrCSH[(id.y * (uint)_mapSizeCSH) + id.x] = UnLerpedHeightMap > 1.0 ? 1.0 : UnLerpedHeightMap;
+        float UnLerpedHeightMap = unlerp(minHeightCSH, maxHeightCSH, heightMapsInverseArrCSH[(id.y * (uint)mapSizeCSH) + id.x]);
+        heightMapsInverseArrCSH[(id.y * (uint)mapSizeCSH) + id.x] = UnLerpedHeightMap > 1.0 ? 1.0 : UnLerpedHeightMap;
     }
 }

@@ -56,7 +56,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             dstManager.SetName(MapEventHolder, "MapEventHolder");
 
 
-            Entity ChunksHolder = dstManager.CreateEntity(typeof(Tag.ChunksHolder), typeof(LinkedEntityGroup));
+            Entity ChunksHolder = dstManager.CreateEntity(typeof(Tag.ChunksHolder), typeof(LinkedEntityGroup), typeof(Chunks.MeshBuffer.Vertices), typeof(Chunks.MeshBuffer.Uvs), typeof(Chunks.MeshBuffer.Triangles));
             dstManager.SetName(ChunksHolder, "ChunksHolder");
         }
     }

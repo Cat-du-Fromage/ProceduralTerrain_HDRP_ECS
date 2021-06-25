@@ -78,23 +78,23 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             //OffsetArray To ComputeBuffer
             ComputeBuffer _offsetsBuffer = new ComputeBuffer(_octaveOffsetArr.Length, sizeof(float) * 2);
-            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "_offsetsArrCSH", _offsetsBuffer, _octaveOffsetArr);
+            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "offsetsArrCSH", _offsetsBuffer, _octaveOffsetArr);
 
             //HeightMapArray To ComputeBuffer
             ComputeBuffer _heightMapBuffer = new ComputeBuffer(_heightMapArr.Length, sizeof(float));
-            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "_heightMapsArrCSH", _heightMapBuffer, _heightMapArr);
+            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "heightMapsArrCSH", _heightMapBuffer, _heightMapArr);
 
             //MinMaxArray To ComputeBuffer
             ComputeBuffer _minMaxBuffer = new ComputeBuffer(_minMaxHeight.Length, sizeof(int));
-            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "_minMaxArrCSH", _minMaxBuffer, _minMaxHeight);
+            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapKernel, "minMaxArrCSH", _minMaxBuffer, _minMaxHeight);
 
             //Set Parameters in ComputeShader
-            _heightMapComputeShader.SetInt("_floatToIntMultiplierCSH", _floatToIntMultiplier);
-            _heightMapComputeShader.SetInt("_mapSizeCSH", GetComponent<MapSett.MapSize>(_mapSettings).Value);
-            _heightMapComputeShader.SetInt("_octavesCSH", GetComponent<MapSett.Octaves>(_mapSettings).Value);
-            _heightMapComputeShader.SetFloat("_lacunarityCSH", GetComponent<MapSett.Lacunarity>(_mapSettings).Value);
-            _heightMapComputeShader.SetFloat("_persistenceCSH", GetComponent<MapSett.Persistance>(_mapSettings).Value);
-            _heightMapComputeShader.SetFloat("_scaleCSH", GetComponent<MapSett.Scale>(_mapSettings).Value);
+            _heightMapComputeShader.SetInt("floatToIntMultiplierCSH", _floatToIntMultiplier);
+            _heightMapComputeShader.SetInt("mapSizeCSH", GetComponent<MapSett.MapSize>(_mapSettings).Value);
+            _heightMapComputeShader.SetInt("octavesCSH", GetComponent<MapSett.Octaves>(_mapSettings).Value);
+            _heightMapComputeShader.SetFloat("lacunarityCSH", GetComponent<MapSett.Lacunarity>(_mapSettings).Value);
+            _heightMapComputeShader.SetFloat("persistenceCSH", GetComponent<MapSett.Persistance>(_mapSettings).Value);
+            _heightMapComputeShader.SetFloat("scaleCSH", GetComponent<MapSett.Scale>(_mapSettings).Value);
 
             //Dispatch ThreadGroup
             (float[], int[]) _requestAsyncGPUHeightMap = await AsyncGPUHeightMap(_heightMapComputeShader, _heightMapKernel, _threadGroups, _heightMapBuffer, _minMaxBuffer);
@@ -116,13 +116,13 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             //HeightMapArray To ComputeBuffer
             ComputeBuffer _heightMapInverseBuffer = new ComputeBuffer(_heightMapArr.Length, sizeof(float));
-            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapInverseKernel, "_heightMapsInverseArrCSH", _heightMapInverseBuffer, _heightMapArr);
+            UtComputeShader.CSHSetBuffer(_heightMapComputeShader, _heightMapInverseKernel, "heightMapsInverseArrCSH", _heightMapInverseBuffer, _heightMapArr);
 
             float _min = (float)_minMaxHeight[0] / (float)_floatToIntMultiplier;
             float _max = (float)_minMaxHeight[1] / (float)_floatToIntMultiplier;
 
-            _heightMapComputeShader.SetFloat("_minHeightCSH", _min);
-            _heightMapComputeShader.SetFloat("_maxHeightCSH", _max);
+            _heightMapComputeShader.SetFloat("minHeightCSH", _min);
+            _heightMapComputeShader.SetFloat("maxHeightCSH", _max);
             _heightMapArr = await AsyncGPUHeightMapUnLerp(_heightMapComputeShader, _heightMapInverseKernel, _threadGroups, _heightMapInverseBuffer);
 
             _heightMapInverseBuffer.Release();

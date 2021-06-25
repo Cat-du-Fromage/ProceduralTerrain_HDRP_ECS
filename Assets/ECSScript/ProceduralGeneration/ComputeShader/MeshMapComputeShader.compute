@@ -1,0 +1,39 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMapMesh
+
+//ReadOnly Parameters
+int mapSizeCSH;
+float topLeftXCSH;
+float topLeftZCSH;
+float heightMulCSH;
+StructuredBuffer<float> noiseMapCSH;
+
+//Write Parameters
+RWStructuredBuffer<float3> verticesPositionCSH;
+RWStructuredBuffer<float2> uvsCSH;
+RWStructuredBuffer<int> trianglesCSH;
+
+[numthreads(32,32,1)]
+void CSMapMesh (uint3 id : SV_DispatchThreadID)
+{
+	int _vertexIndex = (id.y * mapSizeCSH) + id.x;
+	int _triangleIndex = _vertexIndex * 6;
+	if (id.y < (uint)mapSizeCSH && id.x < (uint)mapSizeCSH)
+	{
+		int4 _trianglesVertex = {_vertexIndex, _vertexIndex + mapSizeCSH + 1, _vertexIndex + mapSizeCSH, _vertexIndex + 1};
+		//Vertices Positions on the map
+		verticesPositionCSH[_vertexIndex] = float3(topLeftXCSH + id.x, noiseMapCSH[_vertexIndex]* heightMulCSH, topLeftZCSH - id.y);
+		//Uvs Map
+		uvsCSH[_vertexIndex] = float2(id.x/(float)mapSizeCSH, id.y/ (float)mapSizeCSH);
+		if(id.y < (uint)mapSizeCSH - 1 && id.x < (uint)mapSizeCSH - 1)
+		{
+			trianglesCSH[_triangleIndex] = _trianglesVertex.x;
+			trianglesCSH[_triangleIndex+1] = _trianglesVertex.y;
+			trianglesCSH[_triangleIndex+2] = _trianglesVertex.z;
+			_triangleIndex += 3;
+			trianglesCSH[_triangleIndex] = _trianglesVertex.y;
+			trianglesCSH[_triangleIndex + 1] = _trianglesVertex.x;
+			trianglesCSH[_triangleIndex + 2] = _trianglesVertex.w;
+		}
+	}
+}

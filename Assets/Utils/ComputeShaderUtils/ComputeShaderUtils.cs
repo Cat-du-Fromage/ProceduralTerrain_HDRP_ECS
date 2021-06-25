@@ -20,5 +20,16 @@ namespace KaizerwaldCode.Utils
             computeBuffer.SetData(array);
             computeShader.SetBuffer(kernel, CSdata, computeBuffer);
         }
+        /// <summary>
+        /// Release buffers passed in parameter
+        /// </summary>
+        /// <param name="buffers"></param>
+        public static void CSHReleaseBuffers(params ComputeBuffer[] buffers)
+        {
+            foreach (ComputeBuffer buffer in buffers)
+            {
+                buffer.Release();
+            }
+        }
     }
 }

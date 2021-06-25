@@ -56,27 +56,26 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _renderTexture.enableRandomWrite = true;
             _renderTexture.Create();
 
-            _colorMapComputeShader.SetTexture(0, "_mapTextureCSH", _renderTexture);
-            _colorMapComputeShader.SetInt("_mapSizeCSH", GetComponent<MapSett.MapSize>(_mapSettings).Value);
-            _colorMapComputeShader.SetFloat("_heightMapLength", _mapSurface);
+            _colorMapComputeShader.SetTexture(0, "mapTextureCSH", _renderTexture);
+            _colorMapComputeShader.SetInt("mapSizeCSH", GetComponent<MapSett.MapSize>(_mapSettings).Value);
+            _colorMapComputeShader.SetFloat("heightMapLength", _mapSurface);
             //_regionHeightBuffer To ComputeBuffer
             ComputeBuffer _regionsHeightBuffer = new ComputeBuffer(_regionsHeightArray.Length, sizeof(float));
-            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_regionsHeightArrCSH", _regionsHeightBuffer, _regionsHeightArray);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "regionsHeightArrCSH", _regionsHeightBuffer, _regionsHeightArray);
 
             //_regionColorBuffer To ComputeBuffer
             ComputeBuffer _regionsColorBuffer = new ComputeBuffer(_regionsColorArray.Length, sizeof(float) * 4);
-            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_regionsColorArrCSH", _regionsColorBuffer, _regionsColorArray);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "regionsColorArrCSH", _regionsColorBuffer, _regionsColorArray);
 
             //HeightMapArray To ComputeBuffer
             ComputeBuffer _heightMapBuffer = new ComputeBuffer(GetBuffer<HeightMap>(_mapSettings).Length, sizeof(float));
-            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "_heightMapArrCSH", _heightMapBuffer, _heightMapArray);
+            UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "heightMapArrCSH", _heightMapBuffer, _heightMapArray);
 
             //Get RenderTexture after GPU is done working
             _renderTexture = await AsyncRenderTextureGPU(_colorMapComputeShader, 0, _threadGroups, _regionsColorBuffer, _renderTexture);
+
             //releaseBuffers
-            _heightMapBuffer.Release();
-            _regionsColorBuffer.Release();
-            _regionsHeightBuffer.Release();
+            UtComputeShader.CSHReleaseBuffers(_heightMapBuffer, _regionsColorBuffer, _regionsHeightBuffer);
             #endregion ColorMap Compute Shader
 
             //for test : May need a refactor when Mesh construction completed
@@ -103,7 +102,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         {
             
         }
-        
+
         private async Task<RenderTexture> AsyncRenderTextureGPU(ComputeShader computeShader, int kernel, int threadGroups, ComputeBuffer computeBufferRenderTexture, RenderTexture renderTexture)
         {
             computeShader.Dispatch(kernel, threadGroups, threadGroups, 1);

@@ -3,27 +3,27 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-int _mapSizeCSH;
-int _heightMapLength;
-StructuredBuffer<float> _regionsHeightArrCSH;
-StructuredBuffer<float4> _regionsColorArrCSH;
+int mapSizeCSH;
+int heightMapLength;
+StructuredBuffer<float> regionsHeightArrCSH;
+StructuredBuffer<float4> regionsColorArrCSH;
 
-StructuredBuffer<float> _heightMapArrCSH;
+StructuredBuffer<float> heightMapArrCSH;
 //TextureReturned
-RWTexture2D<float4> _mapTextureCSH;
+RWTexture2D<float4> mapTextureCSH;
 
 
 [numthreads(32,32,1)]
 void CSColorMap(uint3 id : SV_DispatchThreadID)
 {
-    if (id.y < (uint)_mapSizeCSH && id.x < (uint)_mapSizeCSH)
+    if (id.y < (uint)mapSizeCSH && id.x < (uint)mapSizeCSH)
     {
-        float _currentHeight = _heightMapArrCSH[(id.y * (uint)_mapSizeCSH) + id.x];
-        for (int i = 0; i < _heightMapLength; i++)
+        float _currentHeight = heightMapArrCSH[(id.y * (uint)mapSizeCSH) + id.x];
+        for (int i = 0; i < heightMapLength; i++)
         {
-            if (_currentHeight <= _regionsHeightArrCSH[i])
+            if (_currentHeight <= regionsHeightArrCSH[i])
             {
-                _mapTextureCSH[id.xy] = _regionsColorArrCSH[i];
+                mapTextureCSH[id.xy] = regionsColorArrCSH[i];
                 break;
             }
         }
