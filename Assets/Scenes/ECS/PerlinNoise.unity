@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 1187.033, g: 1222.9575, b: 1276.6172, a: 1}
+  m_IndirectSpecularColor: {r: 1224.0652, g: 1271.8125, b: 1341.4248, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -168,11 +168,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.64
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.81
+      value: -21.1
       objectReference: {fileID: 0}
     - target: {fileID: 300645477401153685, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_LocalRotation.w
@@ -208,7 +208,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 764101708831211656, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: field of view
-      value: 28.707916
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 764101708831211656, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
+      propertyPath: m_FocalLength
+      value: 35.153976
       objectReference: {fileID: 0}
     - target: {fileID: 764101708831211656, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: far clip plane
@@ -225,6 +229,18 @@ PrefabInstance:
     - target: {fileID: 764101708831211656, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
       propertyPath: m_projectionMatrixMode
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 764101708831211657, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 764101708831211657, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 764101708831211657, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7efaaa215c69d2a4e9ead0980521ed35, type: 3}
@@ -598,9 +614,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4451af516efab34aad22a9c08867169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapSize: 1000
-  _chunkSize: 200
-  _seed: 56
+  _mapSize: 241
+  _chunkSize: 241
+  _numChunk: 100
+  _seed: 10
   _octaves: 4
   _scale: 100
   _lacunarity: 2
@@ -608,11 +625,38 @@ MonoBehaviour:
   _offset:
     x: 0
     y: 0
-  _heightMultiplier: 4.23
+  _heightMultiplier: 30
   _levelOfDetail: 0
   _animationCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.35474047
+      value: 0.0056880256
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1043767
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 4.7885203
+      outSlope: 4.7885203
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.028945262
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4

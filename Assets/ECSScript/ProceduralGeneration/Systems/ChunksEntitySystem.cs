@@ -10,30 +10,35 @@ using ChunkData = KaizerwaldCode.ProceduralGeneration.Data.Chunks;
 
 namespace KaizerwaldCode.ProceduralGeneration.System
 {
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
     public class ChunksEntitySystem : SystemBase
     {
         EntityManager _em;
         NativeArray<Entity> _numChunksNativeArray;
+        EndInitializationEntityCommandBufferSystem ecbEI;
         protected override void OnCreate()
         {
-            RequireForUpdate(GetEntityQuery(typeof(Data.Event.ColorMapCalculated)));
+            RequireForUpdate(GetEntityQuery(typeof(Data.Event.CreationChunksEntityEvent)));
             _em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            ecbEI = World.GetExistingSystem<EndInitializationEntityCommandBufferSystem>();
         }
 
-        protected override void OnUpdate()
+        protected override void OnStartRunning()
         {
             #region Chunks Creation
             Entity _mapSetting = GetSingletonEntity<Data.Tag.MapSettings>();
-            int _mapSurface = math.mul(GetComponent<Data.PerlinNoise.MapSize>(_mapSetting).Value, GetComponent<Data.PerlinNoise.MapSize>(_mapSetting).Value);
-            int _chunkSurface = math.mul(GetComponent<Data.PerlinNoise.ChunkSize>(_mapSetting).Value, GetComponent<Data.PerlinNoise.ChunkSize>(_mapSetting).Value);
-            int _numChunk = _mapSurface / _chunkSurface;
+
+            int _numChunk = math.mul(
+                GetComponent<Data.PerlinNoise.NumChunk>(_mapSetting).Value,
+                GetComponent<Data.PerlinNoise.NumChunk>(_mapSetting).Value
+            );
 
             EntityArchetype _chunkArchetype = _em.CreateArchetype
             (
                 typeof(Data.Tag.Chunk),
-                //typeof(RenderMesh),
+                typeof(RenderMesh),
                 typeof(LocalToWorld),
-                //typeof(RenderBounds),
+                typeof(RenderBounds),
                 typeof(ChunkData.MeshBuffer.Vertices),
                 typeof(ChunkData.MeshBuffer.Triangles),
                 typeof(ChunkData.MeshBuffer.Uvs),
@@ -47,20 +52,32 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _numChunksNativeArray.Dispose();
             #endregion Chunks Creation
 
-            //Reference Each Chunk into a singelton Entity (ChunksHolder)
+            //Fill chunks holder's Dynamic Buffer with all chunks created
+            Entity _chunkHolder = GetSingletonEntity<Data.Tag.ChunksHolder>();
+            //Buffer : Resize
+            DynamicBuffer<LinkedEntityGroup> _chunksBuffer = _em.GetBuffer<LinkedEntityGroup>(_chunkHolder);
+            _chunksBuffer.ResizeUninitialized(_numChunk);
+            //Buffer : Fill
+            NativeArray<Entity> _chunksNativeArray = GetEntityQuery(typeof(Data.Tag.Chunk)).ToEntityArray(Allocator.TempJob);
+            _chunksBuffer.Reinterpret<Entity>().CopyFrom(_chunksNativeArray);
+            _chunksNativeArray.Dispose();
+        }
+
+        protected override void OnUpdate()
+        {
+            //Assign Chunk Holder as Parent of each chunk (Maybe not useful, but if needed it's available)
+            EntityCommandBuffer ecb = ecbEI.CreateCommandBuffer();
             Entities
                 .WithoutBurst()
                 .WithAll<Data.Tag.Chunk>()
-                .ForEach((Entity chunk, ref Parent parent) =>
+                .ForEach((Entity chunk) =>
                 {
-                    SetComponent(chunk, new Parent(){Value = GetSingletonEntity<Data.Tag.ChunksHolder>()});
-                    DynamicBuffer<LinkedEntityGroup> _chunksBuffer = _em.GetBuffer<LinkedEntityGroup>(GetSingletonEntity<Data.Tag.ChunksHolder>());
-                    _chunksBuffer.Add(chunk);
+                    ecb.SetComponent(chunk, new Parent() { Value = GetSingletonEntity<Data.Tag.ChunksHolder>() });
                 }).Run();
+            ecbEI.AddJobHandleForProducer(this.Dependency);
 
             #region EVENT
-            _em.RemoveComponent<Data.Event.ColorMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
-            _em.AddComponent<Data.Event.ChunksEntityCreated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            _em.RemoveComponent<Data.Event.CreationChunksEntityEvent>(GetSingletonEntity<Data.Tag.MapEventHolder>());
             #endregion EVENT
         }
 

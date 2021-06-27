@@ -85,12 +85,14 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             Material material = _em.GetSharedComponentData<RenderMesh>(GetSingletonEntity<Data.Authoring.TerrainAuthoring>()).material;
             material.mainTexture = _renderTexture;
             //Set the correct Scale to the Mesh
+            /*
             NonUniformScale localToWorldScale = new NonUniformScale
             {
                 Value = new float3(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value)
             };
 
             _em.AddComponentData(GetSingletonEntity<Data.Authoring.TerrainAuthoring>(), localToWorldScale);
+            */
             #endregion TEST
             #region EVENT
             _em.RemoveComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());

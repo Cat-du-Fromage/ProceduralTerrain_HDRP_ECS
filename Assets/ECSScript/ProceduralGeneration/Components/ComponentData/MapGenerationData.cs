@@ -21,6 +21,11 @@ namespace KaizerwaldCode.ProceduralGeneration.Data
         {
             public int Value;
         }
+
+        public struct NumChunk : IComponentData
+        {
+            public int Value;
+        }
         public struct Seed: IComponentData
         {
             public int Value;

@@ -7,7 +7,6 @@ float topLeftXCSH;
 float topLeftZCSH;
 float heightMulCSH;
 StructuredBuffer<float> noiseMapCSH;
-
 //Write Parameters
 RWStructuredBuffer<float3> verticesPositionCSH;
 RWStructuredBuffer<float2> uvsCSH;
@@ -16,7 +15,7 @@ RWStructuredBuffer<int> trianglesCSH;
 [numthreads(32,32,1)]
 void CSMapMesh (uint3 id : SV_DispatchThreadID)
 {
-	int _vertexIndex = (id.y * mapSizeCSH) + id.x;
+	const int _vertexIndex = (id.y * mapSizeCSH) + id.x;
 	int _triangleIndex = _vertexIndex * 6;
 	if (id.y < (uint)mapSizeCSH && id.x < (uint)mapSizeCSH)
 	{
