@@ -47,7 +47,6 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             #endregion Check Values
 
             dstManager.AddComponent<Tag.MapSettings>(entity);
-            dstManager.AddComponent<DynamicBuffer.HeightMap>(entity);
 
             dstManager.AddComponentData(entity, new MapSett.MapSize {Value = _mapSize});
             dstManager.AddComponentData(entity, new MapSett.ChunkSize { Value = _chunkSize });
@@ -65,6 +64,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Data.Conversion
             ComponentTypes _chunkHolderComponents = new ComponentTypes
             (
                 typeof(LinkedEntityGroup),
+                typeof(DynamicBuffer.HeightMap),
                 typeof(Chunks.MeshBuffer.Vertices),
                 typeof(Chunks.MeshBuffer.Uvs),
                 typeof(Chunks.MeshBuffer.Triangles)

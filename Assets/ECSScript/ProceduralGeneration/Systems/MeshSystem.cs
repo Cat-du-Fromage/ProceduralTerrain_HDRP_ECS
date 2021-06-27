@@ -30,9 +30,9 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         {
             //CAREFUL !! NEVER SIZE > 241!!!!!
             Entity _mapSettings = GetSingletonEntity<Data.Tag.MapSettings>();
+            Entity _chunksHolder = GetSingletonEntity<Data.Tag.ChunksHolder>();
+
             int _mapSurface = math.mul(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
-
-
 
             ComputeShader _meshMapComputeShader = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/ECSScript/ProceduralGeneration/ComputeShader/MeshMapComputeShader.compute");
             float _numThreadsGPU = 32f;
@@ -40,7 +40,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             //Set Fields in Compute Shader
             _meshMapComputeShader.SetInt("mapSizeCSH", GetComponent<MapSett.MapSize>(_mapSettings).Value);
-
             _meshMapComputeShader.SetFloat("topLeftXCSH", (GetComponent<MapSett.MapSize>(_mapSettings).Value - 1) / -2f);
             _meshMapComputeShader.SetFloat("topLeftZCSH", (GetComponent<MapSett.MapSize>(_mapSettings).Value - 1) / 2f);
             _meshMapComputeShader.SetFloat("heightMulCSH", GetComponent<MapSett.HeightMultiplier>(_mapSettings).Value);
@@ -49,7 +48,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             MeshCurvedMapJob meshCurvedMapJob = new MeshCurvedMapJob()
             {
                 AnimCurveJob = GetComponent<MapSett.HeightCurve>(_mapSettings).Value,
-                HeightMapJob = GetBuffer<HeightMap>(_mapSettings).Reinterpret<float>().ToNativeArray(Allocator.TempJob),
+                HeightMapJob = GetBuffer<HeightMap>(_chunksHolder).Reinterpret<float>().ToNativeArray(Allocator.TempJob),
                 CurvedHeightMapJob = _curvedNativeArray,
             };
             JobHandle _curveJobHandle = meshCurvedMapJob.Schedule(_mapSurface, JobsUtility.JobWorkerCount - 1);

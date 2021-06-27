@@ -98,7 +98,7 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
     {
         [ReadOnly] public int MapSizeJob;
 
-        [WriteOnly]public NativeArray<float> FallOffMapJob;
+        public NativeArray<float> HeightMapJob;
 
         public void Execute(int index)
         {
@@ -110,7 +110,12 @@ namespace KaizerwaldCode.ProceduralGeneration.Jobs
 
             float _value = math.max(math.abs(_y), math.abs(_x));
 
-            FallOffMapJob[index] = _value;
+            //Evaluate FallOff
+            float _a = 3f;
+            float _b = 3.6f;
+            _value = math.pow(_value, _a) / (math.pow(_value, _a) + math.pow(_b - math.mul(_b, _value), _a));
+
+            HeightMapJob[index] = math.clamp((HeightMapJob[index] - _value), 0, 1);
         }
     }
 }

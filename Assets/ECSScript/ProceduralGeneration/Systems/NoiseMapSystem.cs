@@ -19,13 +19,19 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 {
     public class NoiseMapSystem : SystemBase
     {
-        NativeArray<float2> _octaveOffsetNativeArray;
-        NativeArray<float> _fallOffNativeArray;
+        EntityQuery _event;
+        EntityQueryDesc _eventDescription;
         EntityManager _em;
+        NativeArray<float2> _octaveOffsetNativeArray;
 
         protected override void OnCreate()
         {
-            RequireForUpdate(GetEntityQuery(typeof(Data.Event.MapSettingsConverted)));
+            _eventDescription = new EntityQueryDesc()
+            {
+                All = new ComponentType[] { typeof(Data.Event.HeightMapBigMapCalculEvent) },
+            };
+            _event = GetEntityQuery(_eventDescription);
+            RequireForUpdate(_event);
             _em = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
@@ -50,7 +56,9 @@ namespace KaizerwaldCode.ProceduralGeneration.System
              *Native Array declaration
              ========================*/
             _octaveOffsetNativeArray = new NativeArray<float2>(GetComponent<MapSett.Octaves>(_mapSettings).Value, Allocator.Persistent);
-            _fallOffNativeArray = new NativeArray<float>(_mapSurface, Allocator.Persistent);
+
+//==========================================================================================================================================================
+
             /*========================
              * Random octaves Offset Job
              * return : OctOffsetArrayJob
@@ -68,7 +76,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             float2[] _octaveOffsetArr = _octaveOffsetNativeArray.ToArray();
             _octaveOffsetNativeArray.Dispose();
 
-            //==========================================================================================================================================================
+//==========================================================================================================================================================
 
             #region Noise Map
             /*========================
@@ -101,11 +109,10 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             _heightMapArr = _requestAsyncGPUHeightMap.Item1;
             _minMaxHeight = _requestAsyncGPUHeightMap.Item2;
 
-            _heightMapBuffer.Release();
-            _offsetsBuffer.Release();
-            _minMaxBuffer.Release();
-
+            UtComputeShader.CSHReleaseBuffers(_heightMapBuffer, _offsetsBuffer, _minMaxBuffer);
             #endregion Noise Map
+
+//==========================================================================================================================================================
 
             #region Inverse Lerp Noise Map
 
@@ -129,19 +136,32 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 
             #endregion Inverse Lerp Noise Map
 
+            //==========================================================================================================================================================
+
+            #region FallOffMap
+
+            NativeArray<float> fallOffNativeArray = new NativeArray<float>(_mapSurface, Allocator.TempJob);
+            fallOffNativeArray.CopyFrom(_heightMapArr);
+            MapJobs.FallOffJob fallOffJob = new MapJobs.FallOffJob()
+            {
+                MapSizeJob = GetComponent<MapSett.MapSize>(_mapSettings).Value,
+                HeightMapJob = fallOffNativeArray,
+            };
+            JobHandle _fallOffJobHandle = fallOffJob.Schedule(_mapSurface, JobsUtility.JobWorkerCount - 1);
+            _fallOffJobHandle.Complete();
+            fallOffNativeArray.CopyTo(_heightMapArr);
+            fallOffNativeArray.Dispose();
+            #endregion FallOffMap
             /*========================
              * Pass Noise Map to DynamicBuffer
              * Process : NoiseMap stored
              * END Event : MapSettingsConverted
              * START Event : NoiseMapCalculated
              ========================*/
-            _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<float>().CopyFrom(_heightMapArr);
-            _em.GetBuffer<BufferHeightMap.HeightMap>(_mapSettings).Reinterpret<BufferHeightMap.HeightMap>();
+            _em.GetBuffer<BufferHeightMap.HeightMap>(GetSingletonEntity<Data.Tag.ChunksHolder>()).Reinterpret<float>().CopyFrom(_heightMapArr);
 
-            _fallOffNativeArray.Dispose();
-
-            _em.RemoveComponent<Data.Event.MapSettingsConverted>(GetSingletonEntity<Data.Event.MapSettingsConverted>());
-            _em.AddComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            _em.RemoveComponent<Data.Event.HeightMapBigMapCalculEvent>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            _em.AddComponent<Data.Event.ColorMapCalculEvent>(GetSingletonEntity<Data.Tag.MapEventHolder>());
         }
 
         protected override void OnUpdate()
@@ -198,7 +218,6 @@ namespace KaizerwaldCode.ProceduralGeneration.System
         protected override void OnDestroy()
         {
             if (_octaveOffsetNativeArray.IsCreated) _octaveOffsetNativeArray.Dispose();
-            if (_fallOffNativeArray.IsCreated) _fallOffNativeArray.Dispose();
         }
     }
 }

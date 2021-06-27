@@ -13,12 +13,19 @@ namespace KaizerwaldCode.ProceduralGeneration.System
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public class ChunksEntitySystem : SystemBase
     {
+        EntityQuery _event;
+        EntityQueryDesc _eventDescription;
         EntityManager _em;
         NativeArray<Entity> _numChunksNativeArray;
         EndInitializationEntityCommandBufferSystem ecbEI;
         protected override void OnCreate()
         {
-            RequireForUpdate(GetEntityQuery(typeof(Data.Event.CreationChunksEntityEvent)));
+            _eventDescription = new EntityQueryDesc()
+            {
+                All = new ComponentType[] { typeof(Data.Event.CreationChunksEntityEvent) },
+            };
+            _event = GetEntityQuery(_eventDescription);
+            RequireForUpdate(_event);
             _em = World.DefaultGameObjectInjectionWorld.EntityManager;
             ecbEI = World.GetExistingSystem<EndInitializationEntityCommandBufferSystem>();
         }
@@ -47,7 +54,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
                 typeof(Parent)
             );
 
-            _numChunksNativeArray = new NativeArray<Entity>(_numChunk, Allocator.Persistent);
+            _numChunksNativeArray = new NativeArray<Entity>(_numChunk, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
             _em.CreateEntity(_chunkArchetype, _numChunksNativeArray);
             _numChunksNativeArray.Dispose();
             #endregion Chunks Creation

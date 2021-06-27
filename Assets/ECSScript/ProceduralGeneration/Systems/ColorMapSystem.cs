@@ -20,16 +20,26 @@ namespace KaizerwaldCode.ProceduralGeneration.System
 {
     public class ColorMapSystem : SystemBase
     {
+        EntityQuery _event;
+        EntityQueryDesc _eventDescription;
         EntityManager _em;
         protected override void OnCreate()
         {
-            RequireForUpdate(GetEntityQuery(typeof(Data.Event.NoiseMapCalculated)));
+            _eventDescription = new EntityQueryDesc()
+            {
+                All = new ComponentType[] {typeof(Data.Event.ColorMapCalculEvent)},
+                None = new ComponentType[] { typeof(Data.Event.HeightMapBigMapCalculEvent), typeof(Data.Event.CreationChunksEntityEvent) },
+            };
+            _event = GetEntityQuery(_eventDescription);
+            RequireForUpdate(_event);
+
             _em = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
         protected async override void OnStartRunning()
         {
             Entity _mapSettings = GetSingletonEntity<Data.Tag.MapSettings>();
+            Entity _chunksHolder = GetSingletonEntity<Data.Tag.ChunksHolder>();
             int _mapSurface = math.mul(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value);
 
             #region ColorMap Compute Shader
@@ -37,7 +47,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             float _numThreadsGPU = 32f;
             int _threadGroups = (int)math.ceil(GetComponent<MapSett.MapSize>(_mapSettings).Value / _numThreadsGPU);
 
-            float[] _heightMapArray = GetBuffer<HeightMap>(_mapSettings).AsNativeArray().Reinterpret<float>().ToArray(); //mmmh this seems bad, need some check
+            float[] _heightMapArray = GetBuffer<HeightMap>(_chunksHolder).AsNativeArray().Reinterpret<float>().ToArray(); //mmmh this seems bad, need some check
             //Potential Refactor needed for Regions Data
             //Yet we can't have seperate array from a dynamic buffer with more than one data
             float4[] _regionsColorArray = new float4[GetBuffer<Regions>(_mapSettings).Length];
@@ -68,7 +78,7 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "regionsColorArrCSH", _regionsColorBuffer, _regionsColorArray);
 
             //HeightMapArray To ComputeBuffer
-            ComputeBuffer _heightMapBuffer = new ComputeBuffer(GetBuffer<HeightMap>(_mapSettings).Length, sizeof(float));
+            ComputeBuffer _heightMapBuffer = new ComputeBuffer(_mapSurface, sizeof(float));
             UtComputeShader.CSHSetBuffer(_colorMapComputeShader, 0, "heightMapArrCSH", _heightMapBuffer, _heightMapArray);
 
             //Get RenderTexture after GPU is done working
@@ -85,17 +95,17 @@ namespace KaizerwaldCode.ProceduralGeneration.System
             Material material = _em.GetSharedComponentData<RenderMesh>(GetSingletonEntity<Data.Authoring.TerrainAuthoring>()).material;
             material.mainTexture = _renderTexture;
             //Set the correct Scale to the Mesh
-            /*
+            
             NonUniformScale localToWorldScale = new NonUniformScale
             {
                 Value = new float3(GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value, GetComponent<MapSett.MapSize>(_mapSettings).Value)
             };
 
             _em.AddComponentData(GetSingletonEntity<Data.Authoring.TerrainAuthoring>(), localToWorldScale);
-            */
+            
             #endregion TEST
             #region EVENT
-            _em.RemoveComponent<Data.Event.NoiseMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
+            _em.RemoveComponent<Data.Event.ColorMapCalculEvent>(GetSingletonEntity<Data.Tag.MapEventHolder>());
             _em.AddComponent<Data.Event.ColorMapCalculated>(GetSingletonEntity<Data.Tag.MapEventHolder>());
             #endregion EVENT
         }
